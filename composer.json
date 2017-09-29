@@ -1,0 +1,52 @@
+{
+    "name": "pixwell-dev/laravel-adyen-checkoutapi",
+    "description": "adyen checkout api",
+    "keywords": [
+        "pixwell-dev",
+        "laravel-adyen-checkoutapi",
+        "adyen"
+    ],
+    "homepage": "https://github.com/pixwell-dev/laravel-adyen-checkoutapi",
+    "license": "MIT",
+    "authors": [
+        {
+            "name": "pixwell-dev",
+            "email": "developer@pixwell.sk",
+            "homepage": "https://pixwell.sk",
+            "role": "Developer"
+        }
+    ],
+    "require": {
+        "php": "^7.1",
+        "kitetail/zttp": "^0.1.0"
+    },
+    "require-dev": {
+        "phpunit/phpunit": "^6.0"
+    },
+    "autoload": {
+        "psr-4": {
+            "Pixwell\\LaravelAdyenCheckoutApi\\": "src"
+        }
+    },
+    "autoload-dev": {
+        "psr-4": {
+            "Pixwell\\LaravelAdyenCheckoutApi\\Test\\": "tests"
+        }
+    },
+    "scripts": {
+        "test": "vendor/bin/phpunit"
+    },
+    "config": {
+        "sort-packages": true
+    },
+    "extra": {
+        "laravel": {
+            "providers": [
+                "Pixwell\\LaravelAdyenCheckoutApi\\AdyenCheckoutApiProvider"
+            ],
+            "aliases": {
+                "Skeleton": "Pixwell\\LaravelAdyenCheckoutApi\\AdyenCheckoutApiFacade"
+            }
+        }
+    }
+}
