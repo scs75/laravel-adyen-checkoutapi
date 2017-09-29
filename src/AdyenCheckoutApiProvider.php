@@ -13,27 +13,19 @@ class AdyenCheckoutApiProvider extends ServiceProvider
      */
     public function boot()
     {
-        if ($this->app->runningInConsole()) {
-            if (file_exists(config_path('adyen.php'))) {
-                $this->mergeConfigFrom(__DIR__ . '/../config/adyen.php', 'adyen');
-            } else {
-                $this->publishes([
-                    __DIR__ . '/../config/adyen.php' => config_path('adyen.php'),
-                ], 'config');
-            }
-
-            $this->app->bind(AdyenCheckoutApi::class, function () {
-                $config = $this->app['config']['adyen'];
-                $service = new AdyenCheckoutApi(
-                    $config['environment'],
-                    $config['apiKey'],
-                    $config['random'],
-                    $config['companyName']
-                );
-
-                return $service;
-            });
+        if (file_exists(config_path('adyen.php'))) {
+            $this->mergeConfigFrom(__DIR__ . '/../config/adyen.php', 'adyen');
+        } else {
+            $this->publishes([
+                __DIR__ . '/../config/adyen.php' => config_path('adyen.php'),
+            ], 'config');
         }
+
+        $this->app->bind(AdyenCheckoutApi::class, function () {
+            $config = $this->app['config']['adyen'];
+
+            return new AdyenCheckoutApi($config['apiKey'], $config['baseUrl']);
+        });
     }
 
 

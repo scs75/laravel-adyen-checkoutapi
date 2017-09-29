@@ -9,11 +9,9 @@ use Zttp\Zttp;
 class AdyenCheckoutApi
 {
 
-    public $url;
-
-    const SANDBOX_URL = 'https://checkout-test.adyen.com/services/PaymentSetupAndVerification/';
-    const PRODUCTION_URL = 'https://:random-:companyName-checkout-live.adyenpayments.com/checkout/services/PaymentSetupAndVerification/';
     const API_VERSION = 'v30';
+
+    public $url;
 
     public $apiKey;
 
@@ -21,25 +19,14 @@ class AdyenCheckoutApi
     /**
      * Create a new Skeleton Instance.
      *
-     * @param string $environment
      * @param string $apiKey
-     * @param string $random
-     * @param string $companyName
+     * @param string $baseUrl
      *
      * @throws AdyenEnvironmentException
      */
-    public function __construct(string $environment, string $apiKey, string $random = '', string $companyName = '')
+    public function __construct(string $apiKey, string $baseUrl)
     {
-        if ($environment === 'live') {
-            $this->url = self::PRODUCTION_URL;
-            $this->url = str_replace(':random', $random, $this->url);
-            $this->url = str_replace(':companyName', $companyName, $this->url);
-        } elseif ($environment === 'test') {
-            $this->url = self::SANDBOX_URL;
-        } else {
-            throw new AdyenEnvironmentException();
-        }
-        $this->url .= self::API_VERSION;
+        $this->url = $this->getUrl($baseUrl);
         $this->apiKey = $apiKey;
     }
 
@@ -59,6 +46,26 @@ class AdyenCheckoutApi
         ];
 
         return $this->makeRequest($this->url . '/verify', $data);
+    }
+
+
+    /**
+     * @param string $baseUrl
+     *
+     * @return string
+     * @throws AdyenEnvironmentException
+     */
+    private function getUrl(string $baseUrl): string
+    {
+        if (preg_match('/checkout-live.adyenpayments.com/', $baseUrl)) { // LIVE
+            return $baseUrl . '/checkout/services/PaymentSetupAndVerification/' . self::API_VERSION;
+        }
+
+        if (preg_match('/checkout-test.adyen.com/', $baseUrl)) { // TEST
+            return $baseUrl . '/services/PaymentSetupAndVerification/' . self::API_VERSION;
+        }
+
+        throw new AdyenEnvironmentException();
     }
 
 

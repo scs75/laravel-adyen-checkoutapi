@@ -26,32 +26,6 @@ class SetupRequest
 
 
     /**
-     * @param mixed $channel
-     *
-     * @return SetupRequest
-     */
-    public function setChannel($channel): SetupRequest
-    {
-        $this->channel = $channel;
-
-        return $this;
-    }
-
-
-    /**
-     * @param mixed $token
-     *
-     * @return SetupRequest
-     */
-    public function setToken($token): SetupRequest
-    {
-        $this->token = $token;
-
-        return $this;
-    }
-
-
-    /**
      * @param       $amount
      *
      * @param       $currency
