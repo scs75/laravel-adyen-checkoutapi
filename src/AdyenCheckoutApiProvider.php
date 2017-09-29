@@ -9,7 +9,7 @@ class AdyenCheckoutApiProvider extends ServiceProvider
 
     /**
      * Bootstrap the application services.
-     * @throws \Pixwell\LaravelAdyenCheckoutApi\Exceptions\AdyenEnvironmentException
+     * @throws \Pixwell\LaravelAdyenCheckoutApi\Exceptions\AdyenBaseUrlException
      */
     public function boot()
     {

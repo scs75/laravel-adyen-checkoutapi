@@ -2,7 +2,7 @@
 
 namespace Pixwell\LaravelAdyenCheckoutApi;
 
-use Pixwell\LaravelAdyenCheckoutApi\Exceptions\AdyenEnvironmentException;
+use Pixwell\LaravelAdyenCheckoutApi\Exceptions\AdyenBaseUrlException;
 use Pixwell\LaravelAdyenCheckoutApi\Exceptions\AdyenResponseException;
 use Zttp\Zttp;
 
@@ -22,7 +22,7 @@ class AdyenCheckoutApi
      * @param string $apiKey
      * @param string $baseUrl
      *
-     * @throws AdyenEnvironmentException
+     * @throws AdyenBaseUrlException
      */
     public function __construct(string $apiKey, string $baseUrl)
     {
@@ -53,7 +53,7 @@ class AdyenCheckoutApi
      * @param string $baseUrl
      *
      * @return string
-     * @throws AdyenEnvironmentException
+     * @throws AdyenBaseUrlException
      */
     private function getUrl(string $baseUrl): string
     {
@@ -65,7 +65,7 @@ class AdyenCheckoutApi
             return $baseUrl . '/services/PaymentSetupAndVerification/' . self::API_VERSION;
         }
 
-        throw new AdyenEnvironmentException();
+        throw new AdyenBaseUrlException();
     }
 
 
