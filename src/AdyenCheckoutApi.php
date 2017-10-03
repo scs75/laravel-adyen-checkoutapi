@@ -7,6 +7,7 @@ use Pixwell\LaravelAdyenCheckoutApi\Exceptions\AdyenBaseUrlException;
 use Pixwell\LaravelAdyenCheckoutApi\Exceptions\AdyenResponseException;
 use Pixwell\LaravelAdyenCheckoutApi\Exceptions\PriceMismatchException;
 use Pixwell\LaravelAdyenCheckoutApi\Exceptions\RequiredAttributeException;
+use Pixwell\LaravelAdyenCheckoutApi\Exceptions\VerificationException;
 use Zttp\Zttp;
 
 class AdyenCheckoutApi
@@ -61,6 +62,10 @@ class AdyenCheckoutApi
     public function verify($payload, $price)
     {
         $response = $this->makeRequest($this->url . '/verify', ['payload' => $payload]);
+
+        if (isset($response['authResponse']) && $response['authResponse'] === 'Error') {
+            throw new VerificationException();
+        }
 
         $references = $this->cache->get($this->cacheKey);
         $setupPrice = $references->first(function ($value, $key) use ($response) {
