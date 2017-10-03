@@ -3,6 +3,7 @@
 namespace Pixwell\LaravelAdyenCheckoutApi;
 
 use Illuminate\Contracts\Cache\Repository;
+use Illuminate\Support\Facades\Redis;
 use Pixwell\LaravelAdyenCheckoutApi\Exceptions\AdyenBaseUrlException;
 use Pixwell\LaravelAdyenCheckoutApi\Exceptions\AdyenResponseException;
 use Pixwell\LaravelAdyenCheckoutApi\Exceptions\PriceMismatchException;
@@ -19,7 +20,7 @@ class AdyenCheckoutApi
 
     public $apiKey;
 
-    public $cacheKey = 'adyen:setup.reference';
+    public $redisKey = 'adyen:setup.reference';
 
     /**
      * @var Repository
@@ -39,7 +40,6 @@ class AdyenCheckoutApi
     {
         $this->url = $this->getUrl($baseUrl);
         $this->apiKey = $apiKey;
-        $this->cache = app(Repository::class);
     }
 
 
@@ -47,13 +47,10 @@ class AdyenCheckoutApi
     {
         $payload = $setupRequest->toArray();
 
-        $references = $this->cache->get($this->cacheKey) ?? collect();
-
         if (! isset($payload['reference'], $payload['amount']['value'])) {
             throw new RequiredAttributeException();
         }
-        $references->put($payload['reference'], $payload['amount']['value']);
-        $this->cache->put($this->cacheKey, $references, null);
+        Redis::push($this->getRedisKey($payload['reference']), $payload['amount']['value']);
 
         return $this->makeRequest($this->url . '/setup', $payload);
     }
@@ -67,16 +64,20 @@ class AdyenCheckoutApi
             throw new VerificationException();
         }
 
-        $references = $this->cache->get($this->cacheKey);
-        $setupPrice = $references->first(function ($value, $key) use ($response) {
-            return $key == $response['merchantReference'];
-        });
+        $setupPrice = Redis::get($this->getRedisKey($this->redisKey));
 
         if (! $setupPrice && $setupPrice != $price) {
             throw new PriceMismatchException();
         }
+        Redis::del($this->getRedisKey($this->redisKey));
 
         return $response;
+    }
+
+
+    public function getRedisKey($reference): string
+    {
+        return $this->redisKey . '_' . $reference;
     }
 
 
