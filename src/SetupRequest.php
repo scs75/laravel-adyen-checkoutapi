@@ -40,6 +40,7 @@ class SetupRequest
         $this->setShopperLocale(config('adyen.fallback.locale'));
         $this->setSessionValidity(Carbon::now()->addMinutes(10)->toIso8601String());
         $this->setReturnUrl(config('app.url'));
+        $this->setReference(str_random(40));
     }
 
 

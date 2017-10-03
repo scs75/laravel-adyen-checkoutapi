@@ -48,10 +48,10 @@ class AdyenCheckoutApi
 
         $references = $this->cache->get($this->cacheKey);
 
-        if (! isset($payload['amount']['value'])) {
+        if (! isset($payload['reference'], $payload['amount']['value'])) {
             throw new RequiredAttributeException();
         }
-        $references->put(str_random(40), $payload['amount']['value']);
+        $references->put($payload['reference'], $payload['amount']['value']);
         $this->cache->put($this->cacheKey, $references, null);
 
         return $this->makeRequest($this->url . '/setup', $payload);
