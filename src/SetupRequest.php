@@ -25,6 +25,8 @@ class SetupRequest
 
     public $shopperReference;
 
+    public $merchantAccount;
+
 
     /**
      * SetupRequest constructor.
@@ -34,6 +36,7 @@ class SetupRequest
      */
     public function __construct($token, $channel)
     {
+        $this->merchantAccount = config('adyen.merchantAccount');
         $this->token = $token;
         $this->channel = $channel;
         $this->setCountryCode(config('adyen.fallback.country'));

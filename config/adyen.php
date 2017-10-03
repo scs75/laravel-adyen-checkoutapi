@@ -7,4 +7,5 @@
          'locale' => 'en_GB',
      ],
      'currency' => 'EUR',
+     'merchantAccount' => env('ADYEN_MERCHANT_ACCOUNT'),
  ];
