@@ -2,7 +2,6 @@
 
 namespace Pixwell\LaravelAdyenCheckoutApi;
 
-use Illuminate\Contracts\Cache\Repository;
 use Illuminate\Support\Facades\Redis;
 use Pixwell\LaravelAdyenCheckoutApi\Exceptions\AdyenBaseUrlException;
 use Pixwell\LaravelAdyenCheckoutApi\Exceptions\AdyenResponseException;
@@ -21,11 +20,6 @@ class AdyenCheckoutApi
     public $apiKey;
 
     public $redisKey = 'adyen:setup.reference';
-
-    /**
-     * @var Repository
-     */
-    private $cache;
 
 
     /**
@@ -50,7 +44,7 @@ class AdyenCheckoutApi
         if (! isset($payload['reference'], $payload['amount']['value'])) {
             throw new RequiredAttributeException();
         }
-        Redis::push($this->getRedisKey($payload['reference']), $payload['amount']['value']);
+        Redis::set($this->getRedisKey($payload['reference']), $payload['amount']['value']);
 
         return $this->makeRequest($this->url . '/setup', $payload);
     }
