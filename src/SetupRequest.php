@@ -39,7 +39,7 @@ class SetupRequest
         $this->merchantAccount = config('adyen.merchantAccount');
         $this->token = $token;
         $this->channel = $channel;
-        $this->setCountryCode();
+        $this->setCountryCode(config('adyen.fallback.country'));
         $this->setShopperLocale(config('adyen.fallback.locale'));
         $this->setSessionValidity(Carbon::now()->addMinutes(10)->toIso8601String());
         $this->setReturnUrl(config('app.url'));
@@ -118,7 +118,7 @@ class SetupRequest
      *
      * @return $this
      */
-    public function setCountryCode($countryCode = null)
+    public function setCountryCode($countryCode)
     {
         if ($countryCode) {
             $this->countryCode = $countryCode;
