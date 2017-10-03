@@ -47,7 +47,7 @@ class AdyenCheckoutApi
     {
         $payload = $setupRequest->toArray();
 
-        $references = $this->cache->get($this->cacheKey);
+        $references = $this->cache->get($this->cacheKey) ?? collect();
 
         if (! isset($payload['reference'], $payload['amount']['value'])) {
             throw new RequiredAttributeException();
