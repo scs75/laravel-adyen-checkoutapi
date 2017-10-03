@@ -2,8 +2,11 @@
 
 namespace Pixwell\LaravelAdyenCheckoutApi;
 
+use Illuminate\Contracts\Cache\Repository;
 use Pixwell\LaravelAdyenCheckoutApi\Exceptions\AdyenBaseUrlException;
 use Pixwell\LaravelAdyenCheckoutApi\Exceptions\AdyenResponseException;
+use Pixwell\LaravelAdyenCheckoutApi\Exceptions\PriceMismatchException;
+use Pixwell\LaravelAdyenCheckoutApi\Exceptions\RequiredAttributeException;
 use Zttp\Zttp;
 
 class AdyenCheckoutApi
@@ -14,6 +17,13 @@ class AdyenCheckoutApi
     public $url;
 
     public $apiKey;
+
+    public $cacheKey = 'adyen:setup.reference';
+
+    /**
+     * @var Repository
+     */
+    private $cache;
 
 
     /**
@@ -28,6 +38,7 @@ class AdyenCheckoutApi
     {
         $this->url = $this->getUrl($baseUrl);
         $this->apiKey = $apiKey;
+        $this->cache = app(Repository::class);
     }
 
 
@@ -35,17 +46,32 @@ class AdyenCheckoutApi
     {
         $payload = $setupRequest->toArray();
 
+        $references = $this->cache->get($this->cacheKey);
+
+        if (! isset($payload['amount']['value'])) {
+            throw new RequiredAttributeException();
+        }
+        $references->put(str_random(40), $payload['amount']['value']);
+        $this->cache->put($this->cacheKey, $references, null);
+
         return $this->makeRequest($this->url . '/setup', $payload);
     }
 
 
-    public function verify($payload)
+    public function verify($payload, $price)
     {
-        $data = [
-            'payload' => $payload,
-        ];
+        $response = $this->makeRequest($this->url . '/verify', ['payload' => $payload]);
 
-        return $this->makeRequest($this->url . '/verify', $data);
+        $references = $this->cache->get($this->cacheKey);
+        $setupPrice = $references->first(function ($value, $key) use ($response) {
+            return $key == $response['merchantReference'];
+        });
+
+        if (! $setupPrice && $setupPrice != $price) {
+            throw new PriceMismatchException();
+        }
+
+        return $response;
     }
 
 
