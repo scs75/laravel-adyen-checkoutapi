@@ -54,16 +54,20 @@ class AdyenCheckoutApi
     {
         $response = $this->makeRequest($this->url . '/verify', ['payload' => $payload]);
 
+        if (isset($response['errorMessage'])) {
+            throw new AdyenResponseException($response['errorMessage'], 400);
+        }
+        
         if (isset($response['authResponse']) && $response['authResponse'] === 'Error') {
             throw new VerificationException();
         }
 
-        $setupPrice = Redis::get($this->getRedisKey($this->redisKey));
+        $setupPrice = Redis::get($this->getRedisKey($response['merchantReference']));
 
-        if (! $setupPrice && $setupPrice != $price) {
+        if (! $setupPrice && $setupPrice != ($price * 100)) {
             throw new PriceMismatchException();
         }
-        Redis::del($this->getRedisKey($this->redisKey));
+        Redis::del($this->getRedisKey($response['merchantReference']));
 
         return $response;
     }
