@@ -117,8 +117,8 @@ class AdyenCheckoutApi
         $response = Zttp::asJson()->withHeaders($headers)->post($url, $body);
 
         if ((int)$response->response->getStatusCode() !== 200) {
-            $response = json_decode($response->response->getBody());
-            throw new AdyenResponseException($response->message, $response->status);
+            //$response = json_decode($response->response->getBody());
+            throw new AdyenResponseException($response->response->getReasonPhrase(), $response->response->getStatusCode());
         }
 
         return $response->json();
