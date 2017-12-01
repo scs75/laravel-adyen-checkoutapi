@@ -27,7 +27,10 @@ class SetupRequest
 
     public $merchantAccount;
 
+    public $html = true;
 
+    public $origin;
+    
     /**
      * SetupRequest constructor.
      *
@@ -151,6 +154,18 @@ class SetupRequest
     public function setReturnUrl($returnUrl)
     {
         $this->returnUrl = $returnUrl;
+
+        return $this;
+    }
+    
+    /**
+     * @param string $origin
+     *
+     * @return $this
+     */
+    public function setOrigin($origin)
+    {
+        $this->origin = $origin;
 
         return $this;
     }
